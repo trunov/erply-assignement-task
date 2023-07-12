@@ -2,34 +2,40 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/go-chi/chi"
+	"github.com/go-resty/resty/v2"
 )
 
 type UseCase interface {
-	GetCustomer(ctx context.Context, id int)
+	GetCustomer(ctx context.Context, sessionKey, clientCode, customerID string) (*resty.Response, error)
 }
 
 type Handler struct {
-	useCase UseCase
+	useCase    UseCase
+	clientCode string
 }
 
-func New(useCase UseCase) *Handler {
+func New(useCase UseCase, clientCode string) *Handler {
 	return &Handler{
-		useCase: useCase,
+		useCase:    useCase,
+		clientCode: clientCode,
 	}
 }
 
 func (h *Handler) GetCustomer(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
+	sessionKey := "xxx"
 
-	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id := chi.URLParam(r, "id")
+
+	resp, err := h.useCase.GetCustomer(ctx, sessionKey, h.clientCode, id)
 	if err != nil {
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	h.useCase.GetCustomer(ctx, id)
+	fmt.Println(resp)
 }

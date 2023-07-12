@@ -12,6 +12,7 @@ type Config struct {
 	ClientCode  string `env:"CLIENT_CODE"`
 	Username    string `env:"USERNAME"`
 	Password    string `env:"PASSWORD"`
+	Auth        string `env:"AUTH" envDefault:"admin"`
 }
 
 func ReadConfig() (Config, error) {
@@ -28,6 +29,7 @@ func ReadConfig() (Config, error) {
 	flag.StringVar(&cfgFlag.ClientCode, "c", cfgEnv.ClientCode, "client code")
 	flag.StringVar(&cfgFlag.Username, "u", cfgEnv.Username, "username")
 	flag.StringVar(&cfgFlag.Password, "pass", cfgEnv.Password, "password")
+	flag.StringVar(&cfgFlag.Auth, "auth", cfgEnv.Auth, "auth")
 
 	flag.Parse()
 

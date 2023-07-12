@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/go-resty/resty/v2"
 )
@@ -22,6 +23,24 @@ func New(hc *http.Client, clientCode string) *client {
 	}
 }
 
-func (c *client) GetCustomer(ctx context.Context, id int) {
+func (c *client) GetCustomer(ctx context.Context, sessionKey, clientCode, customerID string) (*resty.Response, error) {
+	requestURL := c.addr
+	payload := url.Values{
+		"sessionKey":      {sessionKey},
+		"request":         {"getCustomers"},
+		"customerID":      {customerID},
+		"sendContentType": {"1"},
+		"clientCode":      {clientCode},
+	}
 
+	resp, err := c.client.R().
+		SetHeader("Content-Type", "application/x-www-form-urlencoded").
+		SetFormDataFromValues(payload).
+		Post(requestURL)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }
