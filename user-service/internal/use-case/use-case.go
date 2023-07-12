@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/trunov/erply-assignement-task/user-service/internal/repository/erply"
 )
 
 type Storage interface {
@@ -12,6 +13,7 @@ type Storage interface {
 
 type Erply interface {
 	GetCustomer(ctx context.Context, sessionKey, clientCode, customerID string) (*resty.Response, error)
+	ErplyAuthentication(ctx context.Context, clientCode, username, password string) (erply.GetVerifyUserResponse, error)
 }
 
 type useCase struct {

@@ -37,7 +37,7 @@ func New(cfg config.Config) (*App, error) {
 	uc := use_case.New(repo, erplyClient)
 
 	h := handler.New(uc, cfg.ClientCode)
-	r := router.NewRouter(h, cfg)
+	r := router.NewRouter(h, erplyClient, cfg)
 
 	s := &http.Server{
 		Handler: r,

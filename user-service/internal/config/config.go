@@ -29,7 +29,7 @@ func ReadConfig() (Config, error) {
 	flag.StringVar(&cfgFlag.ClientCode, "c", cfgEnv.ClientCode, "client code")
 	flag.StringVar(&cfgFlag.Username, "u", cfgEnv.Username, "username")
 	flag.StringVar(&cfgFlag.Password, "pass", cfgEnv.Password, "password")
-	flag.StringVar(&cfgFlag.Auth, "auth", cfgEnv.Auth, "auth")
+	flag.StringVar(&cfgFlag.Auth, "a", cfgEnv.Auth, "auth")
 
 	flag.Parse()
 

@@ -27,7 +27,8 @@ func New(useCase UseCase, clientCode string) *Handler {
 
 func (h *Handler) GetCustomer(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
-	sessionKey := "xxx"
+
+	sessionKey := r.Context().Value("sessionKey").(string)
 
 	id := chi.URLParam(r, "id")
 
