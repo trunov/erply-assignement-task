@@ -37,6 +37,7 @@ func VerifyErplyUser(erply use_case.Erply, clientCode, username, password string
 			if reqCookie != nil {
 				ctx := context.WithValue(r.Context(), ctxName, reqCookie.Value)
 				next.ServeHTTP(w, r.WithContext(ctx))
+				return
 			}
 
 			resp, err := erply.ErplyAuthentication(ctx, clientCode, username, password)

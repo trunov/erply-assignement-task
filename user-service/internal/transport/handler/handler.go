@@ -2,15 +2,15 @@ package handler
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
 	"net/http"
 
 	"github.com/go-chi/chi"
-	"github.com/go-resty/resty/v2"
+	"github.com/trunov/erply-assignement-task/user-service/internal/repository/erply"
 )
 
 type UseCase interface {
-	GetCustomer(ctx context.Context, sessionKey, clientCode, customerID string) (*resty.Response, error)
+	GetCustomer(ctx context.Context, sessionKey, clientCode, customerID string) (erply.Customer, error)
 }
 
 type Handler struct {
@@ -32,11 +32,14 @@ func (h *Handler) GetCustomer(w http.ResponseWriter, r *http.Request) {
 
 	id := chi.URLParam(r, "id")
 
-	resp, err := h.useCase.GetCustomer(ctx, sessionKey, h.clientCode, id)
+	customer, err := h.useCase.GetCustomer(ctx, sessionKey, h.clientCode, id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	fmt.Println(resp)
+	if err := json.NewEncoder(w).Encode(customer); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
