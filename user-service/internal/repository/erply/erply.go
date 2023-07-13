@@ -7,6 +7,7 @@ import (
 	"net/url"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/trunov/erply-assignement-task/user-service/internal/domain"
 )
 
 type client struct {
@@ -73,4 +74,30 @@ func (c *client) ErplyAuthentication(ctx context.Context, clientCode, username, 
 	}
 
 	return response, nil
+}
+
+func (c *client) AddCustomer(ctx context.Context, sessionKey, clientCode string, customer domain.CustomerInput) error {
+	requestURL := c.addr
+	payload := url.Values{
+		"sessionKey":      {sessionKey},
+		"request":         {"saveCustomer"},
+		"clientCode":      {clientCode},
+		"firstName":       {customer.FirstName},
+		"lastName":        {customer.LastName},
+		"email":           {customer.Email},
+		"phone":           {customer.Phone},
+		"twitterID":       {customer.TwitterID},
+		"sendContentType": {"1"},
+	}
+
+	_, err := c.client.R().
+		SetHeader("Content-Type", "application/x-www-form-urlencoded").
+		SetFormDataFromValues(payload).
+		Post(requestURL)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -11,4 +11,10 @@ require (
 	github.com/pressly/goose/v3 v3.13.4
 )
 
-require golang.org/x/net v0.0.0-20211029224645-99673261e6eb // indirect
+require (
+	github.com/go-playground/locales v0.14.1 // indirect
+	github.com/go-playground/universal-translator v0.18.1 // indirect
+	github.com/go-playground/validator v9.31.0+incompatible // indirect
+	github.com/leodido/go-urn v1.2.4 // indirect
+	golang.org/x/net v0.0.0-20211029224645-99673261e6eb // indirect
+)

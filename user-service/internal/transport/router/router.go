@@ -15,6 +15,7 @@ func NewRouter(h *handler.Handler, erply use_case.Erply, cfg config.Config) chi.
 	r.Use(middleware.TokenAuthorization(cfg.Auth))
 
 	r.Get("/customer/{id}", h.GetCustomer)
+	r.Post("/customer", h.AddCustomer)
 
 	return r
 }

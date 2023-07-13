@@ -3,9 +3,9 @@ package use_case
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"strconv"
 
+	"github.com/trunov/erply-assignement-task/user-service/internal/domain"
 	"github.com/trunov/erply-assignement-task/user-service/internal/repository/erply"
 )
 
@@ -16,6 +16,7 @@ type Storage interface {
 
 type Erply interface {
 	GetCustomer(ctx context.Context, sessionKey, clientCode, customerID string) (erply.Customer, error)
+	AddCustomer(ctx context.Context, sessionKey, clientCode string, customer domain.CustomerInput) error
 	ErplyAuthentication(ctx context.Context, clientCode, username, password string) (erply.GetVerifyUserResponse, error)
 }
 
@@ -34,7 +35,6 @@ func New(storage Storage, erply Erply) *useCase {
 func (c *useCase) GetCustomer(ctx context.Context, sessionKey, clientCode, customerID string) (erply.Customer, error) {
 	num, err := strconv.Atoi(customerID)
 	if err != nil {
-		fmt.Println("Error converting string to int:", err)
 		return erply.Customer{}, err
 	}
 
@@ -54,9 +54,17 @@ func (c *useCase) GetCustomer(ctx context.Context, sessionKey, clientCode, custo
 
 	err = c.storage.StoreCustomer(ctx, &customer)
 	if err != nil {
-		fmt.Println(err)
-		fmt.Println("we have an issue with db")
+		return erply.Customer{}, err
 	}
 
 	return customer, nil
+}
+
+func (c *useCase) AddCustomer(ctx context.Context, sessionKey, clientCode string, newCustomer domain.CustomerInput) error {
+	err := c.erply.AddCustomer(ctx, sessionKey, clientCode, newCustomer)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
