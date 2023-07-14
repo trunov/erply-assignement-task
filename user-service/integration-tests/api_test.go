@@ -21,6 +21,37 @@ var customerData = domain.CustomerInput{
 	TwitterID: "john_doe",
 }
 
+var customerDBData = erply.Customer{
+	ID:                   7,
+	CustomerID:           7,
+	FullName:             "Doe, John",
+	CompanyTypeID:        0,
+	FirstName:            "John",
+	LastName:             "Doe",
+	PersonTitleID:        0,
+	EmailEnabled:         1,
+	GroupID:              14,
+	CountryID:            "0",
+	Phone:                "+372555555",
+	Email:                "johndoe@example.com",
+	Birthday:             "0000-00-00",
+	GroupName:            "Vaikimisi grupp",
+	CustomerType:         "PERSON",
+	LastModifierUsername: "kirill.trunov",
+	TwitterID:            "john_doe",
+}
+
+var erplySampleCustomerData = erply.Customer{
+	ID:            123,
+	CustomerID:    123,
+	FullName:      "Test",
+	CompanyName:   "Test",
+	CompanyTypeID: 15,
+	FirstName:     "Test",
+	LastName:      "Test",
+	PersonTitleID: 123,
+}
+
 func mockPostRequestHandler(req *http.Request) (*http.Response, error) {
 	sessionKey := "123123"
 
@@ -84,7 +115,21 @@ func mockPostRequestHandler(req *http.Request) (*http.Response, error) {
 		return httpmock.NewStringResponse(http.StatusOK, string(responseJSON)), nil
 	}
 
-	return httpmock.NewStringResponse(http.StatusOK, ""), nil
+	responseBody := erply.GetCustomerResponse{
+		Status: erply.Status{
+			Request:           "getCusomers",
+			RequestUnixTime:   1689260537,
+			ResponseStatus:    "ok",
+			ErrorCode:         0,
+			GenerationTime:    0.4205901622772217,
+			RecordsTotal:      1,
+			RecordsInResponse: 1,
+		},
+		Records: []erply.Customer{erplySampleCustomerData},
+	}
+	responseJSON, _ := json.Marshal(responseBody)
+
+	return httpmock.NewStringResponse(http.StatusOK, string(responseJSON)), nil
 }
 
 func (s *TestSuite) TestSaveCustomer() {
@@ -121,4 +166,65 @@ func (s *TestSuite) TestSaveCustomer() {
 	defer res.Body.Close()
 
 	s.Require().Equal(http.StatusCreated, res.StatusCode)
+}
+
+func (s *TestSuite) TestGettingCustomerFromErply() {
+	url := fmt.Sprintf("https://%s.erply.com/api/", ClientCode)
+
+	httpmock.RegisterResponder(
+		http.MethodPost,
+		url,
+		mockPostRequestHandler,
+	)
+
+	req, err := http.NewRequest(http.MethodGet, s.server.URL+"/customer/1", nil)
+	s.Require().NoError(err)
+
+	// Set the Authorization header with the bearer token
+	token := Auth
+	req.Header.Set("Authorization", "Bearer "+token)
+
+	res, err := s.server.Client().Do(req)
+	s.Require().NoError(err)
+
+	defer res.Body.Close()
+
+	var respCustomer erply.Customer
+	err = json.NewDecoder(res.Body).Decode(&respCustomer)
+	s.Require().NoError(err)
+
+	s.Require().Equal(http.StatusOK, res.StatusCode)
+	s.Require().Equal(erplySampleCustomerData, respCustomer)
+}
+
+func (s *TestSuite) TestGettingCustomerFromCache() {
+	url := fmt.Sprintf("https://%s.erply.com/api/", ClientCode)
+
+	httpmock.RegisterResponder(
+		http.MethodPost,
+		url,
+		mockPostRequestHandler,
+	)
+
+	// id number 7 is defined in fixtures
+	req, err := http.NewRequest(http.MethodGet, s.server.URL+"/customer/7", nil)
+	s.Require().NoError(err)
+
+	token := Auth
+	req.Header.Set("Authorization", "Bearer "+token)
+
+	res, err := s.server.Client().Do(req)
+	s.Require().NoError(err)
+
+	defer res.Body.Close()
+
+	var respCustomer erply.Customer
+	err = json.NewDecoder(res.Body).Decode(&respCustomer)
+	s.Require().NoError(err)
+
+	s.Require().Equal(http.StatusOK, res.StatusCode)
+
+	s.Require().Equal(customerDBData.ID, respCustomer.ID)
+	s.Require().Equal(customerDBData.CustomerID, respCustomer.CustomerID)
+	s.Require().Equal(customerDBData.FullName, respCustomer.FullName)
 }

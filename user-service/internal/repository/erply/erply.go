@@ -40,12 +40,16 @@ func (c *client) GetCustomer(ctx context.Context, sessionKey, clientCode, custom
 
 	var response GetCustomerResponse
 
-	_, err := c.client.R().
+	resp, err := c.client.R().
 		SetHeader("Content-Type", "application/x-www-form-urlencoded").
 		SetFormDataFromValues(payload).
-		SetResult(&response).
 		Post(requestURL)
 
+	if err != nil {
+		return Customer{}, err
+	}
+
+	err = json.Unmarshal(resp.Body(), &response)
 	if err != nil {
 		return Customer{}, err
 	}
