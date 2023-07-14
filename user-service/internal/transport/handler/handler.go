@@ -29,6 +29,15 @@ func New(useCase UseCase, clientCode string) *Handler {
 	}
 }
 
+// @Summary Get a customer
+// @Description Get a customer by ID
+// @ID get-customer
+// @Accept  json
+// @Produce  json
+// @Param id path int true "Customer ID"
+// @Success 200 {object} Customer
+// @Failure 500
+// @Router /customer/{id} [get]
 func (h *Handler) GetCustomer(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 
@@ -48,6 +57,17 @@ func (h *Handler) GetCustomer(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// @Summary Add a customer
+// @Description Add a new customer
+// @ID add-customer
+// @Accept  json
+// @Produce  json
+// @Param customer body domain.CustomerInput true "Add Customer"
+// @Success 201
+// @Failure 400
+// @Failure 502
+// @Failure 500
+// @Router /customer [post]
 func (h *Handler) AddCustomer(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 

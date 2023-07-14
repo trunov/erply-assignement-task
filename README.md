@@ -15,7 +15,7 @@ Here are the environment variables/flags:
 -   `CLIENT_CODE`: The client code for your Erply account.
 -   `USERNAME`: Your Erply account username.
 -   `PASSWORD`: Your Erply account password.
--   `AUTH`: The authentication method (default: `admin`).
+-   `AUTH`: The authentication bearer token (default: `admin`).
 
 You can run the project by using the following command:
 
@@ -42,6 +42,9 @@ Where:
 -   `email` (required): The email of the customer.
 -   `phone`: The phone number of the customer.
 -   `twitterID`: The Twitter ID of the customer.
+
+Swagger documentation endpoint:
+-   `http://localhost:[port]/swagger/`
 
 ## Middleware
 There are two middleware functions that are used in the application:

@@ -37,6 +37,10 @@ type SaveCustomerRecord struct {
 	AlreadyExists bool `json:"alreadyExists"`
 }
 
+// Customer details
+// @title Customer
+// @description Details of a customer
+// Customer represents customer data
 type Customer struct {
 	ID                      int           `json:"id" db:"id"`
 	CustomerID              int           `json:"customerID" db:"customerid"`
