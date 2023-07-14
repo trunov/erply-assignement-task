@@ -2,6 +2,8 @@ package erply
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -9,6 +11,8 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/trunov/erply-assignement-task/user-service/internal/domain"
 )
+
+var ErrRequestFailed = errors.New("request did not make through")
 
 type client struct {
 	client *resty.Client
@@ -63,12 +67,16 @@ func (c *client) ErplyAuthentication(ctx context.Context, clientCode, username, 
 
 	var response GetVerifyUserResponse
 
-	_, err := c.client.R().
+	resp, err := c.client.R().
 		SetHeader("Content-Type", "application/x-www-form-urlencoded").
 		SetFormDataFromValues(payload).
-		SetResult(&response).
 		Post(requestURL)
 
+	if err != nil {
+		return response, err
+	}
+
+	err = json.Unmarshal(resp.Body(), &response)
 	if err != nil {
 		return response, err
 	}
@@ -90,13 +98,28 @@ func (c *client) AddCustomer(ctx context.Context, sessionKey, clientCode string,
 		"sendContentType": {"1"},
 	}
 
-	_, err := c.client.R().
+	var response SaveCustomerResponse
+
+	resp, err := c.client.R().
 		SetHeader("Content-Type", "application/x-www-form-urlencoded").
 		SetFormDataFromValues(payload).
 		Post(requestURL)
 
 	if err != nil {
 		return err
+	}
+
+	err = json.Unmarshal(resp.Body(), &response)
+	if err != nil {
+		return err
+	}
+
+	if err != nil {
+		return err
+	}
+
+	if response.Status.ResponseStatus != "ok" {
+		return ErrRequestFailed
 	}
 
 	return nil

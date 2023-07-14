@@ -10,6 +10,11 @@ type GetCustomerResponse struct {
 	Records []Customer `json:"records"`
 }
 
+type SaveCustomerResponse struct {
+	Status  Status               `json:"status"`
+	Records []SaveCustomerRecord `json:"records"`
+}
+
 type Status struct {
 	Request           string  `json:"request"`
 	RequestUnixTime   int64   `json:"requestUnixTime"`
@@ -24,6 +29,12 @@ type UserInfo struct {
 	UserID       string `json:"UserID"`
 	EmployeeName string `json:"employeeName"`
 	SessionKey   string `json:"sessionKey"`
+}
+
+type SaveCustomerRecord struct {
+	ClientID      int  `json:"clientID"`
+	CustomerID    int  `json:"customerID"`
+	AlreadyExists bool `json:"alreadyExists"`
 }
 
 type Customer struct {

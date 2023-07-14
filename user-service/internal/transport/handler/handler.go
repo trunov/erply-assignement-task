@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -66,7 +67,11 @@ func (h *Handler) AddCustomer(w http.ResponseWriter, r *http.Request) {
 
 	err := h.useCase.AddCustomer(ctx, sessionKey, h.clientCode, newCustomer)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		if errors.Is(err, erply.ErrRequestFailed) {
+			http.Error(w, err.Error(), http.StatusBadGateway)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
 
